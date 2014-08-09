@@ -1,0 +1,342 @@
+<?php
+$debug = 1;
+
+include('sendmail.php');
+include('gifts_db.php');
+include('actions.php');
+
+$userid = $_COOKIE['uid'];
+$action = $_GET['action'];
+$error = $_GET['e'];
+$msg = $_GET['m'];
+
+if ($action == "log")
+{
+    if ($userid != '')
+    {
+        $userInfo = getUserInfo($userid);
+        if ($userInfo['userEmail'] == 'voilokov@gmail.com')
+        {
+            echo system("pwd; tac log.txt | awk -f logfilter.awk");
+            exit;
+        }
+    }
+    echo 'invalid user';
+    exit;
+}
+
+log_info('userid:'.$userid.', action: '.$action);
+foreach ($_POST as $k=>$v)
+{
+    log_debug('post: '.$k.'='.$v);
+}
+
+$friendid = $_GET['fid'];
+if ($friendid > 0)
+{
+    log_info('userid:'.$friendid);
+    $viewerid = $_COOKIE["vid"];
+    if ($viewerid == '')
+    {
+        $viewerid = createFriend($friendid);
+        setcookie("vid", $viewerid, time()+30*24*3600);
+    }
+    log_info('viewerid:'.$viewerid);
+    
+    if ($action == '')
+    {
+        $action = "view_gifts";
+    }
+}
+else
+{
+    $find_info = $_GET['q'];
+    if ($find_info != '')
+    {
+        $action = 'find_user';
+    }
+}
+
+function respond($error = '', $msg = '')
+{
+    if ($error != '')
+    {
+        $s = '?e='.$error;
+    }
+    if ($msg != '')
+    {
+        $s = '?m='.$msg;
+    }
+
+    header("Location: /".$s);
+    exit;
+}
+
+switch ($action)
+{
+case "logout":
+    setcookie("uid", '', time());
+    respond();
+
+case "login":
+    if ($_POST['login'] == 'Login')
+    {
+        $username = $_POST['useremail'];
+        $password = $_POST['password'];
+        log_debug('username:'.$username.', password: '.$password);
+
+        if ($username == '')
+        {
+            respond('Invalid login');
+        }
+        elseif ($password == '')
+        {
+            respond('Invalid password');
+        }
+        else
+        {
+            $userid = userLogin($username, $password);
+            if ($userid > 0)
+            {
+                setcookie("uid", $userid, time()+3600);
+				log_debug('cookie:'.$userid);
+                respond();
+            }
+            else
+            {
+                respond('Invalid email or password');
+            }
+        }
+    }
+    break;
+
+case "signup":
+    $username = $_POST['useremail'];
+    $userfname = $_POST['userfname'];
+    $userlname = $_POST['userlname'];
+
+    if ($username == '')
+    {
+        respond('Email is empty');
+    }
+    if ($userfname == '')
+    {
+        respond('Firstname is empty');
+    }
+    if ($userlname == '')
+    {
+        respond('Lastname is empty');
+    }
+
+    list($error, $password) = createUser($username, $userfname, $userlname);
+    if ($error != '')
+    {
+        respond($error);
+    }
+    sendMail($username, 'gifts.voilokov.com credentials', 'Password is '.$password);
+    respond('', 'Check email for login information');
+
+case "change_password":
+    $currpassword = $_POST['currpassword'];
+    $newpassword = $_POST['newpassword'];
+    $newpasswordc = $_POST['newpasswordc'];
+
+    if ($currpassword == '')
+    {
+        $error = 'Current password is empty';
+    }
+    elseif ($newpassword == '')
+    {
+        $error = 'New password is empty';
+    }
+    elseif ($newpassword != $newpasswordc)
+    {
+        $error = 'New password doesn\'t match confirmed password';
+    }
+    else
+    {
+        $error = updatePassword($userid, $currpassword, $newpassword);
+    }
+    $redir = "Location: /?action=settings";
+    if ($error != '')
+    {
+        $redir .= "&e=".$error;
+    }
+    else
+    {
+        $redir .= "&e=ok"; 
+    }
+    header($redir);
+    exit;
+
+case "save_settings":
+    $userfname = $_POST['userfname'];
+    $userlname = $_POST['userlname'];
+    $userphoto = $_FILES['userphoto']['tmp_name'];
+    updateSettings($userid, $userfname, $userlname, $userphoto);
+    header("Location: /?action=settings");
+    exit;
+
+case "submit_friends":
+    $friends = $_POST['addfriend_box'];
+    addFriends($userid, $friends);
+    header("Location: /?action=settings#f");
+    exit;
+
+case "submit_holidays":
+    $friends = $_POST['addholiday_box'];
+    addHolidays($userid, $friends);
+    header("Location: /?action=settings#h");
+    exit;
+
+case "submit_email_options":
+    $state = $_POST['send_email_check'];
+    updateEmailCheckState($userid, $state);
+    header("Location: /?action=settings#n");
+    exit;
+
+case "notify_holiday":
+    $holidayid = $_GET['holidayid'];
+    list($to, $subject, $text) = createHolidayEmail($userid, $holidayid);
+    sendMail($to, $subject, $text);
+    respond();
+
+case "submit_gift":
+    $cancel = $_POST['cancel'];
+    if ($cancel == 'Cancel')
+    {
+        respond();
+    }
+    $arr = preg_split("/\n/", $_POST['addgift_box'], 2);
+    $gift_name = $arr[0];
+    if (count($arr) > 1)
+    {
+        $gift_descr = $arr[1];
+    }
+    $gift_url = $_POST['gift_url'];
+    $gift_picture = $_POST['gift_picture'];
+    addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr);
+    respond();
+
+case "delete_gift":
+    $giftid = $_GET['giftid'];
+    deleteGift($userid, $giftid);
+    respond();
+
+case "view_gifts":
+    $friendid = $_GET['fid'];
+    break;
+
+case "select_gift":
+    $giftid = $_GET['giftid'];
+    selectGift($giftid, $viewerid);
+    header("Location: /?fid=".$friendid);
+    exit;
+    break;
+
+case "unselect_gift":
+    $friendid = $_GET['fid'];
+    $giftid = $_GET['giftid'];
+    unselectGift($giftid);
+    header("Location: /?fid=".$friendid);
+    exit;
+    break;
+
+case "paste_gift":
+    $gift_url = $_POST['gift_url'];
+    list($gift_name, $gift_picture) = parseGiftInfo($gift_url);
+#    if (!preg_match("!^https?://!", $gift_name) && $gift_picture == '')
+#    {
+#        addGift($userid, $gift_name, '', '', '');
+#        respond();
+#    }
+        
+    $action = "add_gift";
+    break;
+
+case "update_descr":
+    $giftid = $_POST['giftid'];
+    $gift_descr = $_POST['gift_descr'];
+    updateGift($userid, $giftid, $gift_descr);
+    respond();
+    break;
+
+case "find_user":
+    $found_users = findUser($find_info);
+    if (count($found_users) == 1)
+    {
+        header("Location: /?fid=".$found_users[0]['userID']);
+        exit;
+    }
+    break;
+case "send_emails":
+	$m = sendHolidayEmails();
+	echo $m;
+	exit;
+}
+
+if ($userid != '')
+{
+    $userInfo = getUserInfo($userid);
+}
+
+?>
+<html>
+<head>
+    <link href="/trunk/main.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/trunk/script.js"></script>
+</head>
+<body>
+
+<a class="top" href="?">&nbsp;WHAT I WANT GIFTS</a>
+<span class="w1"></span>
+<? if ($userid != '') { ?>
+
+	Welcome, <? echo $userInfo['firstName'] ?>
+	<a class="add" href="?action=logout">[logout]</a>
+	<a class="add" href="?action=settings">[settings]</a>
+	<? if ($userInfo['userEmail'] == 'voilokov@gmail.com') { ?>
+		<a class="add" href="?action=log">LOG</a>
+	<? } ?>
+<? } ?>
+<br>
+<?
+if ($error != '' && $error != 'ok') { ?>
+    <br><br>
+    <hr class="eopen"/>
+    &nbsp;&nbsp;<font color="red"><b>ERROR: <? echo $error ?><b></font>
+    <hr class="eclose"/>
+    <br>
+    <br>
+<?
+}
+elseif ($msg != '') 
+{
+    echo '&nbsp;&nbsp;'.$msg.'<br><br>';
+}
+
+if ($action == 'view_gifts') 
+{
+    include "select_gifts_form.php";
+}
+elseif ($action == 'find_user')
+{
+    include "select_found_user_form.php";
+}
+elseif ($action == 'settings')
+{
+    include 'settings_form.php';
+} 
+elseif ($userid == '')
+{
+    include "find_form.php";
+    include "login_form.php";
+    include "signup_form.php";
+}
+elseif ($userid != '')
+{
+    include "gifts_form.php";
+}
+?>
+</body>
+</html>

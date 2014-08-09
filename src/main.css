@@ -1,0 +1,124 @@
+body
+{ 
+    font-family: verdana; 
+    font-size: 11px; 
+} 
+
+td 
+{ 
+    font-family: verdana; 
+    font-size: 11px; 
+} 
+
+table 
+{ 
+    border-collapse:collapse; 
+}
+
+input.ib, textarea.ib 
+{ 
+    border: solid 1px darksalmon; 
+    width: 100px; 
+}
+
+input.sb
+{ 
+    border: solid 1px darksalmon; 
+    width: 80px; 
+    background-color: moccasin; 
+}
+
+hr.sep 
+{
+    height: 4px; border: solid 0px salmon; 
+    border-top: solid 1px salmon; 
+    background-color: moccasin; 
+    color: moccasin; 
+}
+
+span.w1 
+{
+    display: inline-block; 
+    width: 120px; 
+}
+
+a.top 
+{ 
+    height: 40px; 
+    font-size: 22px; 
+    text-decoration: none; 
+    color: salmon;
+}
+
+.add 
+{ 
+    text-decoration: none; 
+    color: sienna;
+}
+
+.addg 
+{ 
+    text-decoration: none; 
+    color: green;
+}
+
+hr.eopen 
+{ 
+    height: 4px; 
+    border: solid 0px salmon; 
+    border-top: solid 1px red; 
+    background-color: pink; 
+    color: pink; 
+}
+
+hr.eclose
+{ 
+    height: 4px; 
+    border: solid 0px salmon; 
+    border-bottom: solid 1px salmon; 
+    background-color: pink; 
+    color: pink; 
+}
+
+span.w1
+{ 
+    display: inline-block;
+    width: 120px;
+}
+
+td.gr
+{
+    border-top:dotted 1px lightsalmon;
+    vertical-align: top;
+    height: 80px;
+}
+
+img.gr
+{
+    border: solid 0px white;
+    height: 120px;
+}
+
+span.pwdok
+{
+    color: green;
+    background-color: lightgreen;
+    font-weight: bold;
+}
+
+
+span.pwderr
+{
+    color: red;
+    font-weight: bold;
+}
+
+div.suggbox
+{
+    border: solid 1px gray;
+    width: 200px;
+    position: absolute;
+    background-color: #CCDDFF;
+    font-family: arial;
+}
+

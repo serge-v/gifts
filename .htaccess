@@ -1,0 +1,7 @@
+Options -Indexes
+
+RewriteEngine on
+
+RewriteRule ^ac$ /src/autocomplete.php?$1 [QSA,L]
+RewriteRule ^$ /src/gifts.php [QSA,L]
+
