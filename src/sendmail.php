@@ -1,4 +1,7 @@
 <?php
+
+ini_set("include_path", '/home/voilokov/php:' . ini_get("include_path")  );
+
 require_once('Mail.php');
 
 function sendMail($to, $subject, $body)
