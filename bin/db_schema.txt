@@ -1,0 +1,164 @@
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `EMAIL`
+--
+
+DROP TABLE IF EXISTS `EMAIL`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `EMAIL` (
+  `userID` int(4) NOT NULL,
+  `holidayDescription` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `sentOn` datetime DEFAULT NULL,
+  PRIMARY KEY (`userID`,`holidayDescription`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `FRIEND`
+--
+
+DROP TABLE IF EXISTS `FRIEND`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `FRIEND` (
+  `friendID` int(8) NOT NULL AUTO_INCREMENT,
+  `nameID` int(8) DEFAULT NULL,
+  `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  UNIQUE KEY `friendID` (`friendID`,`nameID`,`email`)
+) ENGINE=MyISAM AUTO_INCREMENT=791 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `FRIEND_GIFT`
+--
+
+DROP TABLE IF EXISTS `FRIEND_GIFT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `FRIEND_GIFT` (
+  `friendID` int(8) NOT NULL,
+  `giftID` int(8) NOT NULL,
+  KEY `friendID` (`friendID`,`giftID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GIFT`
+--
+
+DROP TABLE IF EXISTS `GIFT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `GIFT` (
+  `giftID` int(8) NOT NULL AUTO_INCREMENT,
+  `giftName` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci,
+  `url` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `photoID` int(10) DEFAULT NULL,
+  `addingDate` date NOT NULL,
+  PRIMARY KEY (`giftName`,`giftID`),
+  UNIQUE KEY `giftID` (`giftID`),
+  FULLTEXT KEY `description` (`description`)
+) ENGINE=MyISAM AUTO_INCREMENT=1472 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `HOLIDAY`
+--
+
+DROP TABLE IF EXISTS `HOLIDAY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `HOLIDAY` (
+  `holidayID` int(8) NOT NULL AUTO_INCREMENT,
+  `holidayDate` date NOT NULL,
+  `holidayDescription` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  UNIQUE KEY `holidayID` (`holidayID`)
+) ENGINE=MyISAM AUTO_INCREMENT=97 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `USER`
+--
+
+DROP TABLE IF EXISTS `USER`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `USER` (
+  `userID` int(8) NOT NULL AUTO_INCREMENT,
+  `firstName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lastName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `password` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `userEmail` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `registrationCode` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
+  `registrationDate` date NOT NULL,
+  `sendHolidayEmails` int(4) DEFAULT NULL,
+  UNIQUE KEY `userID` (`userID`)
+) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `USER_FRIEND`
+--
+
+DROP TABLE IF EXISTS `USER_FRIEND`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `USER_FRIEND` (
+  `userID` int(8) NOT NULL,
+  `friendID` int(8) NOT NULL,
+  UNIQUE KEY `userID` (`userID`,`friendID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `USER_GIFT`
+--
+
+DROP TABLE IF EXISTS `USER_GIFT`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `USER_GIFT` (
+  `userID` int(8) NOT NULL,
+  `giftID` int(8) NOT NULL,
+  `friendID` int(8) DEFAULT NULL,
+  KEY `userID` (`userID`,`giftID`),
+  KEY `giftID` (`giftID`),
+  KEY `userID_2` (`userID`),
+  KEY `giftID_2` (`giftID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `USER_HOLIDAY`
+--
+
+DROP TABLE IF EXISTS `USER_HOLIDAY`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `USER_HOLIDAY` (
+  `userID` int(8) NOT NULL,
+  `holidayID` int(8) NOT NULL,
+  KEY `userID` (`userID`,`holidayID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
