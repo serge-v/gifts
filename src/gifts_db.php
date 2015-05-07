@@ -39,13 +39,13 @@ function log_fail($s)
 
 function connect()
 {
-	if ($_SERVER['SERVER_ADDR'] == '192.168.1.8')
+	if ($_SERVER['SERVER_ADDR'] == '68.171.217.98')
 	{
-		include "config_dev.php";
+		include "config_prod.php";
 	}
 	else
 	{
-		include "config_prod.php";
+		include "config_dev.php";
 	}
 	mysql_connect($dbhost, $dbuser, $dbpass) or log_fail('Error connecting to mysql: '.mysql_error());
 	mysql_select_db($dbname) or log_fail('Could not select database: '.mysql_error());
@@ -88,9 +88,9 @@ function createUser($username, $userfname, $userlname)
 	}
 	else
 	{
-		$query = "insert into USER(userEmail, password, firstName, lastName)
+		$query = "insert into USER(userEmail, password, firstName, lastName, registrationCode, registrationDate)
 		         values ('".$username."','".$password."', '".mysql_real_escape_string($userfname)."',
-		         '".mysql_real_escape_string($userlname)."')";
+		         '".mysql_real_escape_string($userlname)."', '1', curdate())";
 
 		if ($result = mysql_query($query))
 		{
@@ -192,6 +192,19 @@ function findUser($find_info)
 		$rows[] = $row;
 	}
 	return $rows;
+}
+
+function findUserIdByEmail($email)
+{
+	connect();
+
+	$query = "select userID from USER where userEmail = '".$email."'";
+	$result = mysql_query($query) or log_fail('findUserByEmail: '. mysql_error());
+	if ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		return $row['userID'];
+	}
+	return 0;
 }
 
 function getFriends($userid, $separator)
@@ -457,10 +470,10 @@ function addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr)
 {
 	connect();
 
-	$query = "insert into GIFT(giftName, url, description)
+	$query = "insert into GIFT(giftName, url, description, addingDate)
 	         values ('".mysql_real_escape_string($gift_name)."', '"
 	         .mysql_real_escape_string($gift_url)."', '"
-	         .mysql_real_escape_string($gift_descr)."')";
+	         .mysql_real_escape_string($gift_descr)."', curdate())";
 	$result = mysql_query($query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	$query = 'SELECT LAST_INSERT_ID() FROM GIFT';
 	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
@@ -693,6 +706,7 @@ function getPicture($url, $text, $hints)
 			{
 				if (stripos($u, $hint) === false)
 					continue;
+
 				$hintcount++;
 			}
 
