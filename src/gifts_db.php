@@ -7,9 +7,21 @@ function log_add($s, $type)
 	fclose($f);
 }
 
-function log_info($s)  { log_add($s, 'INFO '); }
-function log_debug($s) { log_add($s, 'DEBUG'); }
-function log_error($s) { log_add($s, 'ERROR'); }
+function log_info($s)
+{
+	log_add($s, 'INFO ');
+}
+
+function log_debug($s)
+{
+	log_add($s, 'DEBUG');
+}
+
+function log_error($s)
+{
+	log_add($s, 'ERROR');
+}
+
 function log_fail($s)
 {
 	$trace = debug_backtrace();
@@ -17,14 +29,13 @@ function log_fail($s)
 	for ($i = 1; $i < count($trace); $i++)
 	{
 		$text .= "\n  ".$trace[$i]['file'].'('.$trace[$i]['line'].'): '
-			.$trace[$i]['function']."('".implode("', '", $trace[$i]['args'])."')";
+		         .$trace[$i]['function']."('".implode("', '", $trace[$i]['args'])."')";
 	}
 	log_add($s.$text, 'FAIL ');
 	setcookie("uid", '', time());
 	header("Location: /");
 	exit;
 }
-
 
 function connect()
 {
@@ -78,8 +89,8 @@ function createUser($username, $userfname, $userlname)
 	else
 	{
 		$query = "insert into USER(userEmail, password, firstName, lastName)
-			values ('".$username."','".$password."', '".mysql_real_escape_string($userfname)."',
-			'".mysql_real_escape_string($userlname)."')";
+		         values ('".$username."','".$password."', '".mysql_real_escape_string($userfname)."',
+		         '".mysql_real_escape_string($userlname)."')";
 
 		if ($result = mysql_query($query))
 		{
@@ -124,11 +135,11 @@ function updateSettings($userid, $userfname, $userlname, $userphoto)
 	connect();
 
 	$query = "update USER set ".
-		"  firstName = '".mysql_real_escape_string($userfname)."'".
-		", lastName = '".mysql_real_escape_string($userlname)."'".
-		" where userID = ".$userid;
-	 mysql_query($query) or
-		log_fail ('updateSettings: query:'.$query.', error:'.mysql_error());
+	         "  firstName = '".mysql_real_escape_string($userfname)."'".
+	         ", lastName = '".mysql_real_escape_string($userlname)."'".
+	         " where userID = ".$userid;
+	mysql_query($query) or
+	log_fail ('updateSettings: query:'.$query.', error:'.mysql_error());
 
 	if ($userphoto != '')
 	{
@@ -172,9 +183,9 @@ function findUser($find_info)
 	connect();
 
 	$query = "select userID, firstName, lastName from USER
-		where userEmail like '%".$find_info."%'
-		or firstName like '%".$find_info."%'
-		or lastName like '%".$find_info."%'";
+	         where userEmail like '%".$find_info."%'
+	         or firstName like '%".$find_info."%'
+	         or lastName like '%".$find_info."%'";
 	$result = mysql_query($query) or log_fail('findUser: '. mysql_error());
 	while ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
 	{
@@ -203,10 +214,10 @@ function getGifts($userid)
 	connect();
 
 	$query = "select * from USER_GIFT ug, GIFT g
-		where ug.giftID = g.giftID and userID = ".$userid."
-		order by g.giftID desc";
+	         where ug.giftID = g.giftID and userID = ".$userid."
+	         order by g.giftID desc";
 	$result = mysql_query($query) or
-		log_fail('Cannot execute query: '.$query.' Error: '. mysql_error().'\n');
+	          log_fail('Cannot execute query: '.$query.' Error: '. mysql_error().'\n');
 
 	while ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
 	{
@@ -221,7 +232,7 @@ function getEmailCheckState($userid)
 
 	$query = "select sendHolidayEmails from USER where userID = ".$userid;
 	$result = mysql_query($query) or
-		log_fail('Cannot execute query: '.$query.' Error: '. mysql_error().'\n');
+	          log_fail('Cannot execute query: '.$query.' Error: '. mysql_error().'\n');
 
 	while ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
 	{
@@ -248,7 +259,7 @@ function updateEmailCheckState($userid, $state)
 
 	$query = "update USER set sendHolidayEmails = ".$state." where userID = ".$userid;
 	$result = mysql_query($query) or
-		log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
+	          log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	log_debug("updateEmailCheckState: uid:".$userid.", ".$state);
 }
 
@@ -257,7 +268,7 @@ function getHolidays($userid, $format)
 	connect();
 
 	$query = "select * from USER_HOLIDAY uh, HOLIDAY h
-		where uh.holidayID = h.holidayID and userID = ".$userid;
+	         where uh.holidayID = h.holidayID and userID = ".$userid;
 	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
 
 	$content = "";
@@ -265,7 +276,7 @@ function getHolidays($userid, $format)
 	{
 		$d = date_parse($row['holidayDate']);
 		$content .= $d['month'].'/'.$d['day'].','
-			.$row['holidayDescription']."\n";
+		            .$row['holidayDescription']."\n";
 		if ($format == 'html')
 		{
 			$content .= '<br>';
@@ -279,13 +290,13 @@ function getUpcomingHolidaysList($userid)
 	connect();
 
 	$query = "select u.userID, h.holidayID, h.holidayDescription, h.holidayDate, e.sentOn,
-		dayofyear(h.holidayDate)-dayofyear(curdate()) as daysto
-		from USER_HOLIDAY u, USER usr, HOLIDAY h
-		left join EMAIL e on (h.holidayDescription = e.holidayDescription)
-		where u.holidayID = h.holidayID and u.userID = usr.userID
-		and usr.sendHolidayEmails = 1
-		and dayofyear(h.holidayDate) - dayofyear(curdate()) between 0 and 21
-		and (e.sentOn is null or e.sentOn < adddate(curdate(), -344))";
+	         dayofyear(h.holidayDate)-dayofyear(curdate()) as daysto
+	         from USER_HOLIDAY u, USER usr, HOLIDAY h
+	         left join EMAIL e on (h.holidayDescription = e.holidayDescription)
+	         where u.holidayID = h.holidayID and u.userID = usr.userID
+	         and usr.sendHolidayEmails = 1
+	         and dayofyear(h.holidayDate) - dayofyear(curdate()) between 0 and 21
+	         and (e.sentOn is null or e.sentOn < adddate(curdate(), -344))";
 
 	if ($userid > 0)
 	{
@@ -312,7 +323,7 @@ function getNearestNotifications($userid)
 			$sent = ', last sent on '.$row['sentOn'];
 		}
 		$content .= $d['month'].'/'.$d['day'].' '
-			.$row['holidayDescription'].' (in '.$row['daysto'].' days)'.$sent."<br>\n";
+		            .$row['holidayDescription'].' (in '.$row['daysto'].' days)'.$sent."<br>\n";
 	}
 	return $content;
 }
@@ -429,7 +440,7 @@ function addHolidays($userid, $friends)
 		if ($line != '')
 		{
 			$query = "insert into HOLIDAY(holidayDate, holidayDescription)
-				values ('1970/".$cols[0]."', '".$cols[1]."')";
+			         values ('1970/".$cols[0]."', '".$cols[1]."')";
 			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
 			$query = 'SELECT LAST_INSERT_ID() FROM HOLIDAY';
 			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
@@ -447,9 +458,9 @@ function addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr)
 	connect();
 
 	$query = "insert into GIFT(giftName, url, description)
-		values ('".mysql_real_escape_string($gift_name)."', '"
-		.mysql_real_escape_string($gift_url)."', '"
-		.mysql_real_escape_string($gift_descr)."')";
+	         values ('".mysql_real_escape_string($gift_name)."', '"
+	         .mysql_real_escape_string($gift_url)."', '"
+	         .mysql_real_escape_string($gift_descr)."')";
 	$result = mysql_query($query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	$query = 'SELECT LAST_INSERT_ID() FROM GIFT';
 	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
@@ -472,7 +483,7 @@ function updateGift($userid, $giftid, $gift_descr)
 	connect();
 
 	$query = "update GIFT set description = '".mysql_real_escape_string($gift_descr)."'
-		where giftID = ".$giftid;
+	         where giftID = ".$giftid;
 	$result = mysql_query($query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	log_debug("updateGift: uid:".$userid.", ".$giftid.", ".$gift_descr);
 }
@@ -553,7 +564,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!src="(http://childrensplace5.richfx.com.edgesuite.net/image/media[^"]*)!',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -565,7 +576,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!src="(http://www[0-9].assets-gap.com/Asset_Archive/ONWeb/Assets/Product/[^"]*)!',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				print "msrc".$msrc;
 				return $msrc[1];
@@ -589,7 +600,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(http://trus.imageg.net/graphics/product_images/[^"]*)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -601,7 +612,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(http://dsp.imageg.net/graphics/product_images/[^"]*w\.jpg)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -613,7 +624,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(http://slimages.macys.com/is/image/MCY/products/[^"]*)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -625,7 +636,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(http://demandware.edgesuite.net/aacj_prd/on/demandware.static/[^"]*lrg\.jpg)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -637,7 +648,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(http://www.borders.com/ProductImages/products/[^"]*)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -649,7 +660,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(http://images.jr.com/productimages/[^"]*)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -661,7 +672,7 @@ function getPicture($url, $text, $hints)
 		foreach ($matches as $m)
 		{
 			if (preg_match('!"(productimages_new/[^"]*)!i',
-				$m[0], $msrc) > 0)
+			               $m[0], $msrc) > 0)
 			{
 				return 'http://carpatina.com/'.$msrc[1];
 			}
