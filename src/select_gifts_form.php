@@ -2,7 +2,7 @@
 $userInfo = getUserInfo($friendid);
 ?>
 <hr class="sep">
-<img class="gr" src="/trunk/photos/<?=$userInfo['userID']?>.jpg"><br>
+<img class="gr" src="/photos/<?=$userInfo['userID']?>.jpg"><br>
 <b>Gifts that your friend <? echo $userInfo['firstName'] ?> <? echo $userInfo['lastName'] ?> wish to receive</b><br>
 Click <span class="add">[select]</span> to mark item selected by you
 <table>
@@ -16,7 +16,7 @@ foreach ($rows as $row)
 {
     $id = $row['giftID'];
     $imgpath = 'pics/'.$id.'.jpg';
-    $imgurl = '/trunk/pics/'.$id.'.jpg';
+    $imgurl = '/pics/'.$id.'.jpg';
     $name = $row['giftName'];
     $desc = $row['description'];
 ?>

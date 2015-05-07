@@ -1,0 +1,11 @@
+Options -Indexes
+
+RewriteEngine on
+
+RewriteRule ^ac$ /autocomplete.php?$1 [QSA,L]
+RewriteRule ^$ /gifts.php [QSA,L]
+
+<Files log.txt>
+  order allow,deny
+  deny from all
+</Files>

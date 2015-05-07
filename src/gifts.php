@@ -1,4 +1,7 @@
 <?php
+
+require_once 'init.php';
+
 $debug = 1;
 
 include('sendmail.php');
@@ -10,11 +13,45 @@ $action = $_GET['action'];
 $error = $_GET['e'];
 $msg = $_GET['m'];
 
+if (!$error) {
+	if (isset($_SESSION['access_token']) && $_SESSION['access_token'])
+	{
+		$client->setAccessToken($_SESSION['access_token']);
+	}
+
+	if ($client->getAccessToken())
+	{
+		try {
+			$userData = $service->userinfo->get();
+		}
+		catch (Google_Auth_Exception $e) {
+		}
+	
+		if ($userData) {
+			$_SESSION['access_token'] = $client->getAccessToken();
+			$userid = findUserIdByEmail($userData->email);
+		
+			if ($userid == 0) {
+				list($err, $password) = createUser($userData->email, 'name', 'family_name');
+				if ($err != '')
+				{
+					respond($err);
+				}
+				$userid = findUserIdByEmail($userData->email);
+	#			sendMail($username, 'your gifts.voilokov.com account', 'Password is '.$password);
+	#			respond('', 'Check email for login information');
+			}
+		}
+	
+	}
+}
+
 if ($action == "log")
 {
     if ($userid != '')
     {
         $userInfo = getUserInfo($userid);
+	
         if ($userInfo['userEmail'] == 'voilokov@gmail.com')
         {
             echo system("pwd; tac log.txt | awk -f logfilter.awk");
@@ -75,8 +112,9 @@ function respond($error = '', $msg = '')
 switch ($action)
 {
 case "logout":
-    setcookie("uid", '', time());
-    respond();
+	unset($_SESSION['access_token']);
+	$client->revokeToken();
+	header('Location: ' . filter_var($home_uri, FILTER_SANITIZE_URL));
 
 case "login":
     if ($_POST['login'] == 'Login')
@@ -283,8 +321,8 @@ if ($userid != '')
 ?>
 <html>
 <head>
-    <link href="/trunk/main.css" rel="stylesheet" type="text/css"/>
-    <script type="text/javascript" src="/trunk/script.js"></script>
+    <link href="main.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="script.js"></script>
 </head>
 <body>
 
@@ -329,9 +367,15 @@ elseif ($action == 'settings')
 } 
 elseif ($userid == '')
 {
-    include "find_form.php";
-    include "login_form.php";
-    include "signup_form.php";
+	include "find_form.php";
+	$authUrl = $client->createAuthUrl();
+	?>
+	<hr class="sep">
+	<b>Login to edit your own gift list:</b><br><br>
+	<a href="<?= $authUrl ?>"><img height="40px" src="gbutton.png"></a>
+	<br>
+	<?
+	include "login_form.php";
 }
 elseif ($userid != '')
 {

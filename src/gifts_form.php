@@ -76,7 +76,7 @@ a.focus();
 	{
         $id = $row['giftID'];
         $imgpath = 'pics/'.$id.'.jpg';
-        $imgurl = '/trunk/pics/'.$id.'.jpg';
+        $imgurl = '/pics/'.$id.'.jpg';
         $name = $row['giftName'];
         $desc = $row['description'];
 ?>

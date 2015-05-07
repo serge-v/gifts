@@ -39,14 +39,7 @@ function log_fail($s)
 
 function connect()
 {
-	if ($_SERVER['SERVER_ADDR'] == '68.171.217.98')
-	{
-		include "config_prod.php";
-	}
-	else
-	{
-		include "config_dev.php";
-	}
+	global $dbhost, $dbuser, $dbpass, $dbname;
 	mysql_connect($dbhost, $dbuser, $dbpass) or log_fail('Error connecting to mysql: '.mysql_error());
 	mysql_select_db($dbname) or log_fail('Could not select database: '.mysql_error());
 }
@@ -761,4 +754,3 @@ function test()
 }
 
 ?>
-
