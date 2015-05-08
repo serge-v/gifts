@@ -26,7 +26,7 @@ foreach ($rows as $row)
         <a target="_blank" href="<? echo $row['url'] ?>"><img class="gr" src="<?=$imgurl?>"/></a>
          <? } ?>
     </td>
-    <td width="80%" class="gr">
+    <td width="300px" class="gr">
         <?=$name?>
         <br>
         <span class="descr">&nbsp;&nbsp;<?=$desc?>&nbsp;&nbsp;</span>

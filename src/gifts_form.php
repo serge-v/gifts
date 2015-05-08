@@ -86,12 +86,11 @@ a.focus();
 			<a target="_blank" href="<?=$row['url']?>"><img class="gr" src="<?=$imgurl?>"/></a>
             <? } ?>
 		</td>
-		<td width="80%" class="gr">
+		<td width="300px" class="gr">
 			<?=$name?>
             <br>
 			<div id="e<?=$id?>">
-				<a id="ea<?=$id?>" class="add" 
-                    href="javascript:show_update_box('<?=$id?>');void(0)">
+				<a id="ea<?=$id?>" class="add" href="javascript:show_update_box('<?=$id?>');void(0)">
 					[edit info] :&nbsp;<?=$desc?>
 				</a>
 				<div id="ed<?=$id?>" style="display: none; position: absolute;">
