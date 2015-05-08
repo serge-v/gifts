@@ -1,4 +1,6 @@
 <?php
+
+include('init.php');
 include('gifts_db.php');
 
 connect();
