@@ -464,7 +464,7 @@ function addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr)
 	connect();
 
 	$query = "insert into GIFT(giftName, url, description, addingDate)
-	         values ('".mysql_real_escape_string($gift_name)."', '"
+	         values ('".mysql_real_escape_string(substr($gift_name, 0, 200))."', '"
 	         .mysql_real_escape_string($gift_url)."', '"
 	         .mysql_real_escape_string($gift_descr)."', curdate())";
 	$result = mysql_query($query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
