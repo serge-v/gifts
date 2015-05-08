@@ -1,3 +1,6 @@
 *~/
 *~.*
-
+/src/pics/
+/src/run/
+/src/log/
+/bin/db_data.sql
