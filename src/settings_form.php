@@ -2,7 +2,7 @@
 $info = getUserInfo($userid);
 if (file_exists('photos/'.$userid.'.jpg'))
 {
-	$photo = 'trunk/photos/'.$userid.'.jpg';
+	$photo = 'photos/'.$userid.'.jpg';
 }
 ?>
 <hr class="sep">
