@@ -4,3 +4,10 @@
 /src/run/
 /src/log/
 /bin/db_data.sql
+dbc/
+lib/Mail.php
+src/config_dev.php
+src/config_prod.php
+src/log.prod/
+src/log.txt
+src/photos/
