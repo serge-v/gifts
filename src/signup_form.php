@@ -1,5 +1,5 @@
 <hr class="sep">
-<b>Sign up to create own gifts list:</b><br><br>
+<b>Sign up to create own gifts list; OR recreate password:</b><br><br>
 <form method="POST" action="?action=signup">
 	<span class="w1">Email:</span>
 	<input style="width: 250px" class="ib" type="text" name="useremail" value=""/>

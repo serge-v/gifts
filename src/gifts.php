@@ -112,9 +112,17 @@ function respond($error = '', $msg = '')
 switch ($action)
 {
 case "logout":
-	unset($_SESSION['access_token']);
-	$client->revokeToken();
-	header('Location: ' . filter_var($home_uri, FILTER_SANITIZE_URL));
+	if (isset($_SESSION['access_token']) && $_SESSION['access_token'])
+	{
+		unset($_SESSION['access_token']);
+		$client->revokeToken();
+		header('Location: ' . filter_var($home_uri, FILTER_SANITIZE_URL));
+	}
+	else
+	{
+		setcookie("uid", '', time());
+		respond();
+	}
 
 case "login":
     if ($_POST['login'] == 'Login')
@@ -371,11 +379,12 @@ elseif ($userid == '')
 	$authUrl = $client->createAuthUrl();
 	?>
 	<hr class="sep">
-	<b>Login to edit your own gift list:</b><br><br>
+	<b>Login using Google account:</b><br><br>
 	<a href="<?= $authUrl ?>"><img height="40px" src="gbutton.png"></a>
 	<br>
 	<?
 	include "login_form.php";
+	include "signup_form.php";	
 }
 elseif ($userid != '')
 {
