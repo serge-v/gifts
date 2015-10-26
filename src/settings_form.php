@@ -56,44 +56,55 @@ if ($error == 'ok')
 <a name="f"/>
 <hr class="sep">
 <b>Friends:</b><br><br>
-<form method="POST" id="add_friend_form" action="?action=submit_friends">
+<script>
+function setscroll(id)
+{
+	var top = document.documentElement.scrollTop || document.body.scrollTop;
+	var el = document.getElementById(id);
+	el.value = top;
+}
+</script>
+<form method="POST" id="add_friend_form" action="?action=submit_friends" onsubmit="setscroll('scroll_friends');">
 	<span class="w1"></span>
 	<textarea id="addfriend_box" class="ib" name="addfriend_box" 
         style="width: 250px; height: 240px"><? echo getFriends($userid, "") ?></textarea>
-    <br>
-	<br>
+	<br/>
+	<br/>
 	<span class="w1"></span>
-	<input class="sb" type="submit" name="save" value="save">
+	<input class="sb" type="submit" name="save" value="save" />
+	<input id="scroll_friends" type="hidden" name="scroll" value="0" />
 </form>
 <br>
-
+ 
 <a name="h"/>
 <hr class="sep">
 <b>Holidays:</b><br><br>
-<form method="POST" id="add_holiday_form" action="?action=submit_holidays">
+<form method="POST" id="add_holiday_form" action="?action=submit_holidays" onsubmit="setscroll('scroll_holiday');">
 	<span class="w1"></span>
-    One holiday per line (Example: 1/1,New Year)<br>
+	One holiday per line (Example: 1/1,New Year)<br>
 	<span class="w1"></span>
 	<textarea id="addholiday_box" class="ib" name="addholiday_box" 
         style="width: 250px; height: 240px"><? echo getHolidays($userid, "text") ?></textarea>
-    <br>
-    <br>
+	<br>
+	<br>
 	<span class="w1"></span>
 	<input class="sb" type="submit" name="save" value="save">
+	<input id="scroll_holiday" type="hidden" name="scroll" value="0" />
 </form>
 <br>
 
 <a name="n"/>
 <hr class="sep">
 <b>Reminders:</b><br><br>
-<form method="POST" id="email_options_form" action="?action=submit_email_options">
+<form method="POST" id="email_options_form" action="?action=submit_email_options" onsubmit="setscroll('scroll_email');">
 	<span class="w1"></span>
-    <input type="checkbox" name="send_email_check" <? echo getEmailCheckState($userid) ?>>
-    Remind friends by email three weeks before holiday
-    <br>
-    <br>
+	<input type="checkbox" name="send_email_check" <? echo getEmailCheckState($userid) ?>>
+	Remind friends by email three weeks before holiday
+	<br>
+	<br>
 	<span class="w1"></span>
 	<input class="sb" type="submit" name="save" value="save">
+	<input id="scroll_email" type="hidden" name="scroll" value="0" />
 </form>
 <b>Upcoming emails:</b><br><br>
 <? echo getNearestNotifications($userid) ?>
@@ -104,4 +115,6 @@ if ($error == 'ok')
 <form method="POST" enctype="multipart/form-data" action="?">
 	<input class="sb" type="submit" name="return" value="Return"/>
 </form>
-<br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+

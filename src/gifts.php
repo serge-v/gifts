@@ -226,19 +226,19 @@ case "save_settings":
 case "submit_friends":
     $friends = $_POST['addfriend_box'];
     addFriends($userid, $friends);
-    header("Location: /?action=settings#f");
+    header("Location: /?action=settings#".$_POST['scroll']);
     exit;
 
 case "submit_holidays":
     $friends = $_POST['addholiday_box'];
     addHolidays($userid, $friends);
-    header("Location: /?action=settings#h");
+    header("Location: /?action=settings#".$_POST['scroll']);
     exit;
 
 case "submit_email_options":
     $state = $_POST['send_email_check'];
     updateEmailCheckState($userid, $state);
-    header("Location: /?action=settings#n");
+    header("Location: /?action=settings#".$_POST['scroll']);
     exit;
 
 case "notify_holiday":
@@ -331,8 +331,17 @@ if ($userid != '')
 <head>
     <link href="main.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="script.js"></script>
+<script>
+function init()
+{
+	if (window.location.hash != null) {
+		var s = parseInt(window.location.hash.substring(1));
+		window.scrollTo(0, s);
+	}
+}
+</script>
 </head>
-<body>
+<body onload="init()">
 
 <a class="top" href="?">&nbsp;WHAT I WANT GIFTS</a>
 <span class="w1"></span>
