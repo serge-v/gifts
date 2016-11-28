@@ -535,7 +535,22 @@ function getPicture($url, $text, $hints)
 		$r = preg_match_all("/<img[^>]*/", $text, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m)
 		{
-			if (preg_match('!src="(http://ecx.images-amazon.com/images/I/[^"]*)!', $m[0], $msrc) > 0)
+			if (preg_match('!src="(https://images-na.ssl-images-amazon.com/images/I/[^"]*)!', $m[0], $msrc) > 0)
+			{
+				return $msrc[1];
+			}
+			
+			if (preg_match('!data-old-hires=\"(https://images-na.ssl-images-amazon.com/images/[^\"]*)\"!', $m[0], $msrc) > 0)
+			{
+				return $msrc[1];
+			}
+
+			if (preg_match('!data-old-hires=\"\" .*(https://images-na.ssl-images-amazon.com/images/I/.*.jpg)&quot;!', $m[0], $msrc) > 0)
+			{
+				return $msrc[1];
+			}
+
+			if (preg_match('!data-a-dynamic-image=.*(https://images-na.ssl-images-amazon.com/images/I/.*.jpg)&quot;!', $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
 			}
@@ -729,28 +744,23 @@ function getTitle($html)
 
 function parseGiftInfo($url)
 {
-	if (strpos($url, 'http://') === false)
+	$text = @file_get_contents($url);
+	if ($text === false)
 	{
-		$title = $url;
+		return array('cannot get title', 'cannot get picture');
 	}
-	else
-	{
-		$text = @file_get_contents($url);
-		if ($text === false)
-		{
-			return array('cannot get title', 'cannot get picture');
-		}
-		$title = getTitle($text);
-		$picture = getPicture($url, $text, explode(' ', $title));
-		log_debug('$picture:'.$picture);
-	}
+	$title = getTitle($text);
+	$picture = getPicture($url, $text, explode(' ', $title));
+	log_debug('$picture:'.$picture);
 	return array($title, $picture);
 }
 
 function test()
 {
-	$url = 'http://oldnavy.gap.com/browse/product.do?cid=73355&vid=1&pid=885867&scid=885867012';
+	$url = 'https://www.amazon.com/NON-TOXIC-Piece-Children-Play-Exercise/dp/B015T8S91E/ref=sr_1_10?s=toys-and-games&ie=UTF8&qid=1479707174&sr=1-10&keywords=play+pen+for+toddler';
 	print_r(parseGiftInfo($url));
 }
+
+//test();
 
 ?>
