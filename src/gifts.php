@@ -4,14 +4,27 @@ require_once 'init.php';
 
 $debug = 1;
 
-include('sendmail.php');
+# include('sendmail.php');
 include('gifts_db.php');
 include('actions.php');
 
-$userid = $_COOKIE['uid'];
-$action = $_GET['action'];
-$error = $_GET['e'];
-$msg = $_GET['m'];
+$userid = '';
+$action = '';
+$error = '';
+$msg = '';
+
+if (isset($_COOKIE['uid'])) {
+	$userid = $_COOKIE['uid'];
+}
+if (isset($_GET['action'])) {
+	$action = $_GET['action'];
+}
+if (isset($_GET['e'])) {
+	$error = $_GET['e'];
+}
+if (isset($_GET['m'])) {
+	$msg = $_GET['m'];
+}
 
 if (!$error) {
 	if (isset($_SESSION['access_token']) && $_SESSION['access_token'])
@@ -68,7 +81,11 @@ foreach ($_POST as $k=>$v)
     log_debug('post: '.$k.'='.$v);
 }
 
-$friendid = $_GET['fid'];
+$friendid = '';
+if (isset($_GET['fid'])) {
+	$friendid = $_GET['fid'];
+}
+
 if ($friendid > 0)
 {
     log_info('userid:'.$friendid);
@@ -87,7 +104,10 @@ if ($friendid > 0)
 }
 else
 {
-    $find_info = $_GET['q'];
+    $find_info = '';
+    if (isset($_GET['q'])) {
+        $find_info = $_GET['q'];
+    }
     if ($find_info != '')
     {
         $action = 'find_user';
@@ -345,25 +365,25 @@ function init()
 
 <a class="top" href="?">&nbsp;WHAT I WANT GIFTS</a>
 <span class="w1"></span>
-<? if ($userid != '') { ?>
+<?php if ($userid != '') { ?>
 
-	Welcome, <? echo $userInfo['firstName'] ?>
+	Welcome, <?php echo $userInfo['firstName'] ?>
 	<a class="add" href="?action=logout">[logout]</a>
 	<a class="add" href="?action=settings">[settings]</a>
-	<? if ($userInfo['userEmail'] == 'voilokov@gmail.com') { ?>
+	<?php if ($userInfo['userEmail'] == 'voilokov@gmail.com') { ?>
 		<a class="add" href="?action=log">LOG</a>
-	<? } ?>
-<? } ?>
+	<?php } ?>
+<?php } ?>
 <br>
-<?
+<?php
 if ($error != '' && $error != 'ok') { ?>
     <br><br>
     <hr class="eopen"/>
-    &nbsp;&nbsp;<font color="red"><b>ERROR: <? echo $error ?><b></font>
+    &nbsp;&nbsp;<font color="red"><b>ERROR: <?php echo $error ?><b></font>
     <hr class="eclose"/>
     <br>
     <br>
-<?
+<?php
 }
 elseif ($msg != '') 
 {
@@ -391,7 +411,7 @@ elseif ($userid == '')
 	<b>Login using Google account:</b><br><br>
 	<a href="<?= $authUrl ?>"><img height="40px" src="gbutton.png"></a>
 	<br>
-	<?
+	<?php
 	include "login_form.php";
 	include "signup_form.php";	
 }
@@ -402,3 +422,4 @@ elseif ($userid != '')
 ?>
 </body>
 </html>
+
