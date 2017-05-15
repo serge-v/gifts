@@ -539,7 +539,7 @@ function getPicture($url, $text, $hints)
 			{
 				return $msrc[1];
 			}
-			
+
 			if (preg_match('!data-old-hires=\"(https://images-na.ssl-images-amazon.com/images/[^\"]*)\"!', $m[0], $msrc) > 0)
 			{
 				return $msrc[1];
@@ -745,6 +745,7 @@ function getTitle($html)
 function parseGiftInfo($url)
 {
 	$text = @file_get_contents($url);
+	echo $text;
 	if ($text === false)
 	{
 		return array('cannot get title', 'cannot get picture');
@@ -757,10 +758,10 @@ function parseGiftInfo($url)
 
 function test()
 {
-	$url = 'https://www.amazon.com/NON-TOXIC-Piece-Children-Play-Exercise/dp/B015T8S91E/ref=sr_1_10?s=toys-and-games&ie=UTF8&qid=1479707174&sr=1-10&keywords=play+pen+for+toddler';
+	$url = 'https://www.amazon.com/First-Disney-Frozen-Guitar-Ukulele/dp/B01DPISLCW/ref=sr_1_2?ie=UTF8&qid=1481379628&sr=8-2-spons&keywords=guitar&psc=1';
 	print_r(parseGiftInfo($url));
 }
 
-//test();
+test();
 
 ?>

@@ -19,7 +19,7 @@ function show_update_box(id)
 
 <br><b>Add a gift</b><br><br>
 
-<? if ($action == "add_gift") { 
+<?php if ($action == "add_gift") {
       if ($gift_name == '') $gift_name = "enter name on this line (replace all text);";
       if ($gift_url == '') $gift_url = "this line should contain hyperlink to the gift";
 	  
@@ -31,19 +31,19 @@ function show_update_box(id)
 	<form method="POST" id="add_gift_form" action="?action=submit_gift">
 		Title:<br>
 		<input id="addgift_box" class="ib" name="addgift_box" 
-			style="width: 580px" value="<? echo $gift_name ?>">
+			style="width: 580px" value="<?php echo $gift_name ?>">
 		<br><br>
 		Image Location:
 		<br>
 		<input class="ib" name="gift_picture" 
-			style="width: 580px" value="<? echo $gift_picture ?>">
+			style="width: 580px" value="<?php echo $gift_picture ?>">
 		<br><br>
-        <img height="120px" src="<? echo $gift_picture ?>"/>
+        <img height="120px" src="<?php echo $gift_picture ?>"/>
 		<br>
 		<br>
 		<input class="sb" type="submit" name="add" value="Add">
 		<input class="sb" type="submit" name="cancel" value="Cancel">
-		<input type="hidden" name="gift_url" value="<? echo $gift_url ?>">
+		<input type="hidden" name="gift_url" value="<?php echo $gift_url ?>">
 	</form>
 </div>
 <hr class="sep">
@@ -52,7 +52,7 @@ var a = document.getElementById('addgift_box');
 a.focus();
 </script>
 
-<? } else { ?>
+<?php } else { ?>
 
 <form method="POST" id="paste_gift_form" action="?action=paste_gift">
     <input type="text" name="gift_url" id="addlink" class="ib" style="width: 400px; color: gray" 
@@ -60,7 +60,7 @@ a.focus();
     	onchange="javascript:paste_gift()" value="paste URL or name here and press ENTER" />
 </form>
 <br>
-<? } ?>
+<?php } ?>
 
 <b>Gift list</b><br>
 (Copy and send this link to friends: <b>http://<?=$_SERVER['HTTP_HOST'] ?>/?fid=<?=$userid ?></b>)
@@ -70,7 +70,7 @@ a.focus();
 <th width="300px">&nbsp;</th>
 <th>&nbsp;</th>
 </tr>
-<? $rows = getGifts($userid);
+<?php $rows = getGifts($userid);
 	if (count($rows) > 0)
    	foreach ($rows as $row)
 	{
@@ -82,9 +82,9 @@ a.focus();
 ?>
 	<tr>
 		<td width="100px" class="gr">
-            <? if (file_exists($imgpath)) { ?>
+            <?php if (file_exists($imgpath)) { ?>
 			<a target="_blank" href="<?=$row['url']?>"><img class="gr" src="<?=$imgurl?>"/></a>
-            <? } ?>
+            <?php } ?>
 		</td>
 		<td width="300px" class="gr">
 			<?=$name?>
@@ -107,7 +107,7 @@ a.focus();
 			</div>
 		</td>
 	</tr>
-<? } ?>
+<?php } ?>
 </table>
 <br>
 <br>

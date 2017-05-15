@@ -1,4 +1,4 @@
-<?
+<?php
 $info = getUserInfo($userid);
 if (file_exists('photos/'.$userid.'.jpg'))
 {
@@ -10,18 +10,18 @@ if (file_exists('photos/'.$userid.'.jpg'))
 <form method="POST" enctype="multipart/form-data" action="?action=save_settings">
 	<input type="hidden" name="MAX_FILE_SIZE" value="500000" />
 	<span class="w1">Email:</span>
-	<? echo $info['userEmail'] ?>
+	<?php echo $info['userEmail'] ?>
 	<br><br>
 	<span class="w1">First name:</span>
 	<input style="width: 250px" class="ib" 
-		type="text" name="userfname" value="<? echo $info['firstName'] ?>"/>
+		type="text" name="userfname" value="<?php echo $info['firstName'] ?>"/>
 	<br><br>
 	<span class="w1">Last name:</span>
 	<input style="width: 250px" class="ib" 
-		type="text" name="userlname" value="<? echo $info['lastName'] ?>"/>
+		type="text" name="userlname" value="<?php echo $info['lastName'] ?>"/>
 	<br><br>
 	<span class="w1">Photo:</span>
-	<? if ($photo != '') { echo '<img width="120px" src="'.$photo.'">'; } ?>
+	<?php if ($photo != '') { echo '<img width="120px" src="'.$photo.'">'; } ?>
 	<br><br>
 	<span class="w1">New photo:</span>
 	<input style="width: 250px;" class="ib" type="file" name="userphoto" value=""/>
@@ -32,7 +32,7 @@ if (file_exists('photos/'.$userid.'.jpg'))
 <br>
 <hr class="sep">
 <b>Change password:</b><br><br>
-<?
+<?php
 if ($error == 'ok')
 {
     echo '<span class="pwdok">Password saved</span><br><br>';
@@ -67,7 +67,7 @@ function setscroll(id)
 <form method="POST" id="add_friend_form" action="?action=submit_friends" onsubmit="setscroll('scroll_friends');">
 	<span class="w1"></span>
 	<textarea id="addfriend_box" class="ib" name="addfriend_box" 
-        style="width: 250px; height: 240px"><? echo getFriends($userid, "") ?></textarea>
+        style="width: 250px; height: 240px"><?php echo getFriends($userid, "") ?></textarea>
 	<br/>
 	<br/>
 	<span class="w1"></span>
@@ -84,7 +84,7 @@ function setscroll(id)
 	One holiday per line (Example: 1/1,New Year)<br>
 	<span class="w1"></span>
 	<textarea id="addholiday_box" class="ib" name="addholiday_box" 
-        style="width: 250px; height: 240px"><? echo getHolidays($userid, "text") ?></textarea>
+        style="width: 250px; height: 240px"><?php echo getHolidays($userid, "text") ?></textarea>
 	<br>
 	<br>
 	<span class="w1"></span>
@@ -98,7 +98,7 @@ function setscroll(id)
 <b>Reminders:</b><br><br>
 <form method="POST" id="email_options_form" action="?action=submit_email_options" onsubmit="setscroll('scroll_email');">
 	<span class="w1"></span>
-	<input type="checkbox" name="send_email_check" <? echo getEmailCheckState($userid) ?>>
+	<input type="checkbox" name="send_email_check" <?php echo getEmailCheckState($userid) ?>>
 	Remind friends by email three weeks before holiday
 	<br>
 	<br>
@@ -107,7 +107,7 @@ function setscroll(id)
 	<input id="scroll_email" type="hidden" name="scroll" value="0" />
 </form>
 <b>Upcoming emails:</b><br><br>
-<? echo getNearestNotifications($userid) ?>
+<?php echo getNearestNotifications($userid) ?>
 <br>
 
 <hr class="sep">

@@ -4,7 +4,7 @@ require_once 'init.php';
 
 $debug = 1;
 
-include('sendmail.php');
+#include('sendmail.php');
 include('gifts_db.php');
 include('actions.php');
 
@@ -26,11 +26,11 @@ if (!$error) {
 		}
 		catch (Google_Auth_Exception $e) {
 		}
-	
+
 		if ($userData) {
 			$_SESSION['access_token'] = $client->getAccessToken();
 			$userid = findUserIdByEmail($userData->email);
-		
+
 			if ($userid == 0) {
 				list($err, $password) = createUser($userData->email, 'name', 'family_name');
 				if ($err != '')
@@ -42,7 +42,7 @@ if (!$error) {
 	#			respond('', 'Check email for login information');
 			}
 		}
-	
+
 	}
 }
 
@@ -51,7 +51,7 @@ if ($action == "log")
     if ($userid != '')
     {
         $userInfo = getUserInfo($userid);
-	
+
         if ($userInfo['userEmail'] == 'voilokov@gmail.com')
         {
             echo system("pwd; tac log.txt | awk -f logfilter.awk");
@@ -79,7 +79,7 @@ if ($friendid > 0)
         setcookie("vid", $viewerid, time()+30*24*3600);
     }
     log_info('viewerid:'.$viewerid);
-    
+
     if ($action == '')
     {
         $action = "view_gifts";
@@ -210,7 +210,7 @@ case "change_password":
     }
     else
     {
-        $redir .= "&e=ok"; 
+        $redir .= "&e=ok";
     }
     header($redir);
     exit;
@@ -296,7 +296,7 @@ case "paste_gift":
 #        addGift($userid, $gift_name, '', '', '');
 #        respond();
 #    }
-        
+
     $action = "add_gift";
     break;
 
@@ -345,32 +345,32 @@ function init()
 
 <a class="top" href="?">&nbsp;WHAT I WANT GIFTS</a>
 <span class="w1"></span>
-<? if ($userid != '') { ?>
+<?php if ($userid != '') { ?>
 
-	Welcome, <? echo $userInfo['firstName'] ?>
+	Welcome, <?php echo $userInfo['firstName'] ?>
 	<a class="add" href="?action=logout">[logout]</a>
 	<a class="add" href="?action=settings">[settings]</a>
-	<? if ($userInfo['userEmail'] == 'voilokov@gmail.com') { ?>
+	<?php if ($userInfo['userEmail'] == 'voilokov@gmail.com') { ?>
 		<a class="add" href="?action=log">LOG</a>
-	<? } ?>
-<? } ?>
+	<?php } ?>
+<?php } ?>
 <br>
-<?
+<?php
 if ($error != '' && $error != 'ok') { ?>
     <br><br>
     <hr class="eopen"/>
-    &nbsp;&nbsp;<font color="red"><b>ERROR: <? echo $error ?><b></font>
+    &nbsp;&nbsp;<font color="red"><b>ERROR: <?php echo $error ?><b></font>
     <hr class="eclose"/>
     <br>
     <br>
-<?
+<?php
 }
-elseif ($msg != '') 
+elseif ($msg != '')
 {
     echo '&nbsp;&nbsp;'.$msg.'<br><br>';
 }
 
-if ($action == 'view_gifts') 
+if ($action == 'view_gifts')
 {
     include "select_gifts_form.php";
 }
@@ -381,7 +381,7 @@ elseif ($action == 'find_user')
 elseif ($action == 'settings')
 {
     include 'settings_form.php';
-} 
+}
 elseif ($userid == '')
 {
 	include "find_form.php";
@@ -391,9 +391,9 @@ elseif ($userid == '')
 	<b>Login using Google account:</b><br><br>
 	<a href="<?= $authUrl ?>"><img height="40px" src="gbutton.png"></a>
 	<br>
-	<?
+	<?php
 	include "login_form.php";
-	include "signup_form.php";	
+	include "signup_form.php";
 }
 elseif ($userid != '')
 {
