@@ -349,8 +349,8 @@ if ($userid != '')
 ?>
 <html>
 <head>
-    <link href="main.css" rel="stylesheet" type="text/css"/>
-    <script type="text/javascript" src="script.js"></script>
+    <link href="/files/main.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/files/script.js"></script>
 <script>
 function init()
 {
@@ -409,7 +409,7 @@ elseif ($userid == '')
 	?>
 	<hr class="sep">
 	<b>Login using Google account:</b><br><br>
-	<a href="<?= $authUrl ?>"><img height="40px" src="gbutton.png"></a>
+	<a href="<?= $authUrl ?>"><img height="40px" src="/files/gbutton.png"></a>
 	<br>
 	<?php
 	include "login_form.php";
