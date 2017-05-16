@@ -68,11 +68,11 @@ function createUser($username, $userfname, $userlname)
 	{
 		if ($userfname != '')
 		{
-			$add_info = ", firstName = '".mysql_real_escape_string($userfname)."'";
+			$add_info = ", firstName = '".mysqli_real_escape_string($conn, $userfname)."'";
 		}
 		if ($userlname != '')
 		{
-			$add_info .= ", lastName = '".mysql_real_escape_string($userlname)."'";
+			$add_info .= ", lastName = '".mysqli_real_escape_string($conn, $userlname)."'";
 		}
 
 		$query = "update USER set password = '".$password."' ".$add_info." where userID = ".$row[0];
@@ -83,8 +83,8 @@ function createUser($username, $userfname, $userlname)
 	else
 	{
 		$query = "insert into USER(userEmail, password, firstName, lastName, registrationCode, registrationDate)
-		         values ('".$username."','".$password."', '".mysql_real_escape_string($userfname)."',
-		         '".mysql_real_escape_string($userlname)."', '1', curdate())";
+		         values ('".$username."','".$password."', '".mysqli_real_escape_string($conn, $userfname)."',
+		         '".mysqli_real_escape_string($conn, $userlname)."', '1', curdate())";
 
 		if ($result = mysql_query($query))
 		{
@@ -115,7 +115,7 @@ function updatePassword($userid, $currpassword, $newpassword)
 		{
 			return 'Current password is invalid';
 		}
-		$q = "update USER set password = '".mysqli_real_escape_string($newpassword)."' where userID = ".$userid;
+		$q = "update USER set password = '".mysqli_real_escape_string($conn, $newpassword)."' where userID = ".$userid;
 		mysqli_query($conn, $q) or log_fail ('updatePassword: q:'.$q.', error:'.mysqli_error($conn));
 	}
 	else
@@ -129,8 +129,8 @@ function updateSettings($userid, $userfname, $userlname, $userphoto)
 	$conn = connect();
 
 	$query = "update USER set ".
-	         "  firstName = '".mysql_real_escape_string($userfname)."'".
-	         ", lastName = '".mysql_real_escape_string($userlname)."'".
+	         "  firstName = '".mysqli_real_escape_string($conn, $userfname)."'".
+	         ", lastName = '".mysqli_real_escape_string($conn, $userlname)."'".
 	         " where userID = ".$userid;
 	mysqli_query($conn, $query) or
 	log_fail ('updateSettings: query:'.$query.', error:'.mysqli_error($conn));
@@ -466,9 +466,9 @@ function addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr)
 	$conn = connect();
 
 	$query = "insert into GIFT(giftName, url, description, addingDate)
-	         values ('".mysql_real_escape_string(substr($gift_name, 0, 200))."', '"
-	         .mysql_real_escape_string($gift_url)."', '"
-	         .mysql_real_escape_string($gift_descr)."', curdate())";
+	         values ('".mysqli_real_escape_string($conn, substr($gift_name, 0, 200))."', '"
+	         .mysqli_real_escape_string($conn, $gift_url)."', '"
+	         .mysqli_real_escape_string($conn, $gift_descr)."', curdate())";
 	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query:'.$query.' Error: '.mysqli_error($conn));
 	$query = 'SELECT LAST_INSERT_ID() FROM GIFT';
 	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysqli_error($conn));
@@ -490,7 +490,7 @@ function updateGift($userid, $giftid, $gift_descr)
 {
 	$conn = connect();
 
-	$query = "update GIFT set description = '".mysql_real_escape_string($gift_descr)."'
+	$query = "update GIFT set description = '".mysqli_real_escape_string($conn, $gift_descr)."'
 	         where giftID = ".$giftid;
 	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query:'.$query.' Error: '.mysqli_error($conn));
 	log_debug("updateGift: uid:".$userid.", ".$giftid.", ".$gift_descr);
