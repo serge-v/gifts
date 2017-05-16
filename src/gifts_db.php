@@ -764,6 +764,7 @@ function test()
 	print_r(parseGiftInfo($url));
 }
 
-test();
+//test();
 
 ?>
+
