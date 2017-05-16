@@ -51,7 +51,7 @@ function createPassword($length)
 	$i = 0;
 	$password = "";
 	while ($i < $length) {
-		$password .= $chars{mt_rand(0,strlen($chars))};
+		$password .= $chars{mt_rand(1,strlen($chars)-1)};
 		$i++;
 	}
 	return $password;
@@ -76,7 +76,7 @@ function createUser($username, $userfname, $userlname)
 		}
 
 		$query = "update USER set password = '".$password."' ".$add_info." where userID = ".$row[0];
-		mysql_queryi($conn, $query) or log_fail ('createUser (update): query:'.$query.', error:'.mysqli_error($conn));
+		mysqli_query($conn, $query) or log_fail ('createUser (update): query:'.$query.', error:'.mysqli_error($conn));
 		log_debug('user already exists: '.$username.' '.$query);
 		return array('', $password);
 	}
