@@ -8,10 +8,23 @@ $debug = 1;
 include('gifts_db.php');
 include('actions.php');
 
-$userid = $_COOKIE['uid'];
-$action = $_GET['action'];
-$error = $_GET['e'];
-$msg = $_GET['m'];
+$userid = '';
+$action = '';
+$error = '';
+$msg = '';
+
+if (isset($_COOKIE['uid'])) {
+	$userid = $_COOKIE['uid'];
+}
+if (isset($_GET['action'])) {
+	$action = $_GET['action'];
+}
+if (isset($_GET['e'])) {
+	$error = $_GET['e'];
+}
+if (isset($_GET['m'])) {
+	$msg = $_GET['m'];
+}
 
 if (!$error) {
 	if (isset($_SESSION['access_token']) && $_SESSION['access_token'])
@@ -68,7 +81,11 @@ foreach ($_POST as $k=>$v)
     log_debug('post: '.$k.'='.$v);
 }
 
-$friendid = $_GET['fid'];
+$friendid = '';
+if (isset($_GET['fid'])) {
+	$friendid = $_GET['fid'];
+}
+
 if ($friendid > 0)
 {
     log_info('userid:'.$friendid);
@@ -87,7 +104,10 @@ if ($friendid > 0)
 }
 else
 {
-    $find_info = $_GET['q'];
+    $find_info = '';
+    if (isset($_GET['q'])) {
+        $find_info = $_GET['q'];
+    }
     if ($find_info != '')
     {
         $action = 'find_user';
@@ -329,8 +349,8 @@ if ($userid != '')
 ?>
 <html>
 <head>
-    <link href="main.css" rel="stylesheet" type="text/css"/>
-    <script type="text/javascript" src="script.js"></script>
+    <link href="/files/main.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/files/script.js"></script>
 <script>
 function init()
 {
@@ -389,7 +409,7 @@ elseif ($userid == '')
 	?>
 	<hr class="sep">
 	<b>Login using Google account:</b><br><br>
-	<a href="<?= $authUrl ?>"><img height="40px" src="gbutton.png"></a>
+	<a href="<?= $authUrl ?>"><img height="40px" src="/files/gbutton.png"></a>
 	<br>
 	<?php
 	include "login_form.php";

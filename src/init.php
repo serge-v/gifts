@@ -2,10 +2,7 @@
 
 require_once '../lib/google-api-php-client/src/Google/autoload.php';
 
-if ($_SERVER['SERVER_ADDR'] == '68.171.217.98')
-	include "config_prod.php";
-else
-	include "config_dev.php";
+include "config_dev.php";
 
 $app_name = "gifts.voilokov.com";
 $client_id = '1068101048338-ojkeas1t2hubi8supo00kgvvutb7rrfa.apps.googleusercontent.com';

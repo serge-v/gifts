@@ -22,7 +22,7 @@ function show_update_box(id)
 <?php if ($action == "add_gift") {
       if ($gift_name == '') $gift_name = "enter name on this line (replace all text);";
       if ($gift_url == '') $gift_url = "this line should contain hyperlink to the gift";
-	  
+
       log_debug('$gift_name='.$gift_name);
 
 ?>
@@ -30,12 +30,12 @@ function show_update_box(id)
 <div class="form" style="width: 600px;">
 	<form method="POST" id="add_gift_form" action="?action=submit_gift">
 		Title:<br>
-		<input id="addgift_box" class="ib" name="addgift_box" 
+		<input id="addgift_box" class="ib" name="addgift_box"
 			style="width: 580px" value="<?php echo $gift_name ?>">
 		<br><br>
 		Image Location:
 		<br>
-		<input class="ib" name="gift_picture" 
+		<input class="ib" name="gift_picture"
 			style="width: 580px" value="<?php echo $gift_picture ?>">
 		<br><br>
         <img height="120px" src="<?php echo $gift_picture ?>"/>
@@ -55,7 +55,7 @@ a.focus();
 <?php } else { ?>
 
 <form method="POST" id="paste_gift_form" action="?action=paste_gift">
-    <input type="text" name="gift_url" id="addlink" class="ib" style="width: 400px; color: gray" 
+    <input type="text" name="gift_url" id="addlink" class="ib" style="width: 400px; color: gray"
 	    onfocus="javascript:document.getElementById('addlink').value=''"
     	onchange="javascript:paste_gift()" value="paste URL or name here and press ENTER" />
 </form>
@@ -96,13 +96,12 @@ a.focus();
 				<div id="ed<?=$id?>" style="display: none; position: absolute;">
 					<form method="POST" id="update_descr_form" action="?action=update_descr">
 						<input class="sb" type="submit" value="set">
-						<input id="edd<?=$id?>" type="text" name="gift_descr" 
-							class="ib" style="width: 400px; color: gray" 
+						<input id="edd<?=$id?>" type="text" name="gift_descr"
+							class="ib" style="width: 400px; color: gray"
 							value="<?=$desc?>" />
 						<input type="hidden" name="giftid" value="<?=$id?>">
 					</form>
-					<a title="delete <?=$name?>" class="add" 
-                        href="?action=delete_gift&giftid=<?=$id?>"><b>[delete gift]</b></a>
+					<a title="delete <?=$name?>" class="add" href="?action=delete_gift&giftid=<?=$id?>"><b>[delete gift]</b></a>
 				</div>
 			</div>
 		</td>
@@ -111,4 +110,3 @@ a.focus();
 </table>
 <br>
 <br>
-

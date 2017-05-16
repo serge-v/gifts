@@ -40,8 +40,9 @@ function log_fail($s)
 function connect()
 {
 	global $dbhost, $dbuser, $dbpass, $dbname;
-	mysql_connect($dbhost, $dbuser, $dbpass) or log_fail('Error connecting to mysql: '.mysql_error());
-	mysql_select_db($dbname) or log_fail('Could not select database: '.mysql_error());
+	$conn = mysqli_connect($dbhost, $dbuser, $dbpass) or log_fail('Error connecting to mysql: '.mysql_error());
+	mysqli_select_db($conn, $dbname) or log_fail('Could not select database: '.mysql_error());
+	return $conn;
 }
 
 function createPassword($length)
@@ -58,12 +59,12 @@ function createPassword($length)
 
 function createUser($username, $userfname, $userlname)
 {
-	connect();
+	$conn = connect();
 
 	$password = createPassword(8);
 	$query = "select userID from USER where userEmail = '".$username."'";
-	$result = mysql_query($query) or log_fail ('createUser (select): '. mysql_error());
-	if ($row = mysql_fetch_array($result))
+	$result = mysqli_query($conn, $query) or log_fail ('createUser (select): '. mysql_error());
+	if ($row = mysqli_fetch_array($result))
 	{
 		if ($userfname != '')
 		{
@@ -75,7 +76,7 @@ function createUser($username, $userfname, $userlname)
 		}
 
 		$query = "update USER set password = '".$password."' ".$add_info." where userID = ".$row[0];
-		mysql_query($query) or log_fail ('createUser (update): query:'.$query.', error:'.mysql_error());
+		mysql_queryi($conn, $query) or log_fail ('createUser (update): query:'.$query.', error:'.mysql_error());
 		log_debug('user already exists: '.$username.' '.$query);
 		return array('', $password);
 	}
@@ -88,8 +89,8 @@ function createUser($username, $userfname, $userlname)
 		if ($result = mysql_query($query))
 		{
 			$query = 'SELECT LAST_INSERT_ID() FROM USER';
-			$result = mysql_query($query) or log_fail ('createUser (insert): '. mysql_error());
-			$row = mysql_fetch_array($result);
+			$result = mysqli_query($conn, $query) or log_fail ('createUser (insert): '. mysql_error());
+			$row = mysqli_fetch_array($result);
 			$userid = $row[0];
 			log_info('createUser: '.$userid);
 		}
@@ -104,18 +105,18 @@ function createUser($username, $userfname, $userlname)
 
 function updatePassword($userid, $currpassword, $newpassword)
 {
-	connect();
+	$conn = connect();
 
 	$q = "select * from USER where userID = ".$userid;
-	$result = mysql_query($q) or log_fail('updatePassword: q:'.$q.', error:'.mysql_error());
-	if ($row = mysql_fetch_array($result))
+	$result = mysqli_query($conn, $q) or log_fail('updatePassword: q:'.$q.', error:'.mysql_error());
+	if ($row = mysqli_fetch_array($result))
 	{
 		if ($row['password'] != $currpassword)
 		{
 			return 'Current password is invalid';
 		}
-		$q = "update USER set password = '".mysql_real_escape_string($newpassword)."' where userID = ".$userid;
-		mysql_query($q) or log_fail ('updatePassword: q:'.$q.', error:'.mysql_error());
+		$q = "update USER set password = '".mysqli_real_escape_string($newpassword)."' where userID = ".$userid;
+		mysqli_query($conn, $q) or log_fail ('updatePassword: q:'.$q.', error:'.mysql_error());
 	}
 	else
 	{
@@ -125,13 +126,13 @@ function updatePassword($userid, $currpassword, $newpassword)
 
 function updateSettings($userid, $userfname, $userlname, $userphoto)
 {
-	connect();
+	$conn = connect();
 
 	$query = "update USER set ".
 	         "  firstName = '".mysql_real_escape_string($userfname)."'".
 	         ", lastName = '".mysql_real_escape_string($userlname)."'".
 	         " where userID = ".$userid;
-	mysql_query($query) or
+	mysqli_query($conn, $query) or
 	log_fail ('updateSettings: query:'.$query.', error:'.mysql_error());
 
 	if ($userphoto != '')
@@ -145,11 +146,11 @@ function updateSettings($userid, $userfname, $userlname, $userphoto)
 
 function userLogin($username, $password)
 {
-	connect();
+	$conn = connect();
 
 	$query = "SELECT userID FROM USER where userEmail = '".$username."' AND password = '".$password."'";
-	$result = mysql_query($query) or log_fail ('userLogin: '. mysql_error());
-	if ($row = mysql_fetch_array($result))
+	$result = mysqli_query($conn, $query) or log_fail ('userLogin: '. mysql_error());
+	if ($row = mysqli_fetch_array($result))
 	{
 		$userid = $row[0];
 	}
@@ -162,25 +163,26 @@ function userLogin($username, $password)
 
 function getUserInfo($userid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select * from USER u where userid = ".$userid;
-	$result = mysql_query($query) or log_fail('getUserInfo: '.$query.'. Error: '. mysql_error());
-	$row = mysql_fetch_array($result);
+	$result = mysqli_query($conn, $query) or log_fail('getUserInfo: '.$query.'. Error: '. mysql_error());
+	$row = mysqli_fetch_array($result);
 
 	return $row;
 }
 
 function findUser($find_info)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select userID, firstName, lastName from USER
 	         where userEmail like '%".$find_info."%'
 	         or firstName like '%".$find_info."%'
 	         or lastName like '%".$find_info."%'";
-	$result = mysql_query($query) or log_fail('findUser: '. mysql_error());
-	while ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
+	$result = mysqli_query($conn, $query) or log_fail('findUser: '. mysql_error());
+	$rows = null;
+	while ($row = @mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		$rows[] = $row;
 	}
@@ -189,11 +191,11 @@ function findUser($find_info)
 
 function findUserIdByEmail($email)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select userID from USER where userEmail = '".$email."'";
-	$result = mysql_query($query) or log_fail('findUserByEmail: '. mysql_error());
-	if ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
+	$result = mysqli_query($conn, $query) or log_fail('findUserByEmail: '. mysql_error());
+	if ($row = @mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		return $row['userID'];
 	}
@@ -202,13 +204,13 @@ function findUserIdByEmail($email)
 
 function getFriends($userid, $separator)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select * from USER_FRIEND uf, FRIEND f where uf.friendID = f.friendID and userID = ".$userid;
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error().'\n');
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error().'\n');
 
 	$content = "";
-	while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+	while ($row = mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		$content .= $row['email'].$separator."\n";
 	}
@@ -217,15 +219,15 @@ function getFriends($userid, $separator)
 
 function getGifts($userid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select * from USER_GIFT ug, GIFT g
 	         where ug.giftID = g.giftID and userID = ".$userid."
 	         order by g.giftID desc";
-	$result = mysql_query($query) or
+	$result = mysqli_query($conn, $query) or
 	          log_fail('Cannot execute query: '.$query.' Error: '. mysql_error().'\n');
 
-	while ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
+	while ($row = @mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		$rows[] = $row;
 	}
@@ -234,13 +236,13 @@ function getGifts($userid)
 
 function getEmailCheckState($userid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select sendHolidayEmails from USER where userID = ".$userid;
-	$result = mysql_query($query) or
+	$result = mysqli_query($conn, $query) or
 	          log_fail('Cannot execute query: '.$query.' Error: '. mysql_error().'\n');
 
-	while ($row = @mysql_fetch_array($result, MYSQL_ASSOC))
+	while ($row = @mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		if ($row['sendHolidayEmails'] == 1)
 		{
@@ -252,7 +254,7 @@ function getEmailCheckState($userid)
 
 function updateEmailCheckState($userid, $state)
 {
-	connect();
+	$conn = connect();
 
 	if ($state == "on")
 	{
@@ -264,21 +266,21 @@ function updateEmailCheckState($userid, $state)
 	}
 
 	$query = "update USER set sendHolidayEmails = ".$state." where userID = ".$userid;
-	$result = mysql_query($query) or
+	$result = mysqli_query($conn, $query) or
 	          log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	log_debug("updateEmailCheckState: uid:".$userid.", ".$state);
 }
 
 function getHolidays($userid, $format)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select * from USER_HOLIDAY uh, HOLIDAY h
 	         where uh.holidayID = h.holidayID and userID = ".$userid;
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 
 	$content = "";
-	while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+	while ($row = mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		$d = date_parse($row['holidayDate']);
 		$content .= $d['month'].'/'.$d['day'].','
@@ -293,7 +295,7 @@ function getHolidays($userid, $format)
 
 function getUpcomingHolidaysList($userid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "select u.userID, h.holidayID, h.holidayDescription, h.holidayDate, e.sentOn,
 	         dayofyear(h.holidayDate)-dayofyear(curdate()) as daysto
@@ -311,7 +313,7 @@ function getUpcomingHolidaysList($userid)
 
 	$query .= " order by daysto";
 
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 	return $result;
 }
 
@@ -336,19 +338,19 @@ function getNearestNotifications($userid)
 
 function updateSentDate($userid, $holidayDescription)
 {
-	connect();
+	$conn = connect();
 
 	$q = "select * from EMAIL where userID = ".$userid." and holidayDescription = '".$holidayDescription."'";
-	$result = mysql_query($q) or log_fail('updateSentDate: q:'.$q.', error:'.mysql_error());
-	if ($row = mysql_fetch_array($result))
+	$result = mysqli_query($conn, $q) or log_fail('updateSentDate: q:'.$q.', error:'.mysql_error());
+	if ($row = mysqli_fetch_array($result))
 	{
 		$q = "update EMAIL set sentOn = curdate() where userID = ".$userid." and holidayDescription = '".$holidayDescription."'";
-		mysql_query($q) or log_fail ('updateSentDate: q:'.$q.', error:'.mysql_error());
+		mysqli_query($conn, $q) or log_fail ('updateSentDate: q:'.$q.', error:'.mysql_error());
 	}
 	else
 	{
 		$q = "insert into EMAIL(userID, holidayDescription, sentOn) values(".$userid.", '".$holidayDescription."', curdate())";
-		mysql_query($q) or log_fail ('updateSentDate: q:'.$q.', error:'.mysql_error());
+		mysqli_query($conn, $q) or log_fail ('updateSentDate: q:'.$q.', error:'.mysql_error());
 	}
 }
 
@@ -375,12 +377,12 @@ function createHolidayEmail($userid, $holidayid, $holidayDescription, $holidayDa
 	$user = getUserInfo($userid);
 	$date = date_parse($holidayDate);
 
-	connect();
+	$conn = connect();
 
 	$query = "select * from USER_FRIEND uf, FRIEND f where uf.friendID = f.friendID and uf.userID = ".$userid;
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 	$friends = '';
-	while ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+	while ($row = mysqli_fetch_array($result, MYSQL_ASSOC))
 	{
 		$friends .= $row['email'].',';
 	}
@@ -393,24 +395,24 @@ function createHolidayEmail($userid, $holidayid, $holidayDescription, $holidayDa
 
 function addFriends($userid, $friends)
 {
-	connect();
+	$conn = connect();
 
 	$lines = split("[\r\n]", $friends);
 	$query = "delete from USER_FRIEND where userID = ".$userid;
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 
 	foreach ($lines as $line)
 	{
 		if ($line != '')
 		{
 			$query = "insert into FRIEND(email) values ('".$line."')";
-			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+			$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 			$query = 'SELECT LAST_INSERT_ID() FROM FRIEND';
-			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
-			$row = mysql_fetch_array($result);
+			$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
+			$row = mysqli_fetch_array($result);
 			$friendid = $row[0];
 			$query = "insert into USER_FRIEND(userID, friendID) values (".$userid.",".$friendid.")";
-			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+			$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 			log_debug("addFriends: uid:".$userid.", ".$line);
 		}
 	}
@@ -418,27 +420,27 @@ function addFriends($userid, $friends)
 
 function createFriend($userid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "insert into FRIEND(email) values ('".$line."')";
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 	$query = 'SELECT LAST_INSERT_ID() FROM FRIEND';
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
-	$row = mysql_fetch_array($result);
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
+	$row = mysqli_fetch_array($result);
 	$friendid = $row[0];
 	$query = "insert into USER_FRIEND(userID, friendID) values (".$userid.",".$friendid.")";
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 	log_debug("createFriend: uid: ".$userid.", friendid: ".$friendid);
 	return $friendid;
 }
 
 function addHolidays($userid, $friends)
 {
-	connect();
+	$conn = connect();
 
 	$lines = split("[\r\n]", $friends);
 	$query = "delete from USER_HOLIDAY where userID = ".$userid;
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 
 	foreach ($lines as $line)
 	{
@@ -447,13 +449,13 @@ function addHolidays($userid, $friends)
 		{
 			$query = "insert into HOLIDAY(holidayDate, holidayDescription)
 			         values ('1970/".$cols[0]."', '".$cols[1]."')";
-			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+			$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 			$query = 'SELECT LAST_INSERT_ID() FROM HOLIDAY';
-			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
-			$row = mysql_fetch_array($result);
+			$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
+			$row = mysqli_fetch_array($result);
 			$holidayid = $row[0];
 			$query = "insert into USER_HOLIDAY(userID, holidayID) values (".$userid.",".$holidayid.")";
-			$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+			$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 			log_debug("addHolidays: uid:".$userid.", ".$line);
 		}
 	}
@@ -461,19 +463,19 @@ function addHolidays($userid, $friends)
 
 function addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr)
 {
-	connect();
+	$conn = connect();
 
 	$query = "insert into GIFT(giftName, url, description, addingDate)
 	         values ('".mysql_real_escape_string(substr($gift_name, 0, 200))."', '"
 	         .mysql_real_escape_string($gift_url)."', '"
 	         .mysql_real_escape_string($gift_descr)."', curdate())";
-	$result = mysql_query($query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	$query = 'SELECT LAST_INSERT_ID() FROM GIFT';
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
-	$row = mysql_fetch_array($result);
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
+	$row = mysqli_fetch_array($result);
 	$giftid = $row[0];
 	$query = "insert into USER_GIFT(userID, giftID) values (".$userid.",".$giftid.")";
-	$result = mysql_query($query) or log_fail('Cannot execute query '. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysql_error());
 
 	if ($gift_picture != '')
 	{
@@ -486,38 +488,38 @@ function addGift($userid, $gift_name, $gift_url, $gift_picture, $gift_descr)
 
 function updateGift($userid, $giftid, $gift_descr)
 {
-	connect();
+	$conn = connect();
 
 	$query = "update GIFT set description = '".mysql_real_escape_string($gift_descr)."'
 	         where giftID = ".$giftid;
-	$result = mysql_query($query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query:'.$query.' Error: '.mysql_error());
 	log_debug("updateGift: uid:".$userid.", ".$giftid.", ".$gift_descr);
 }
 
 function deleteGift($userid, $giftid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "delete from USER_GIFT where userID = ".$userid." and giftID = ".$giftid;
-	$result = mysql_query($query) or log_fail('Cannot execute query "'.$query.'". Error:'. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query "'.$query.'". Error:'. mysql_error());
 	log_debug("deleteGift: uid:".$userid.", giftid:".$giftid);
 }
 
 function selectGift($giftid, $friendid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "update USER_GIFT set friendID = ".$friendid." where giftID = ".$giftid;
-	$result = mysql_query($query) or log_fail('Cannot execute query "'.$query.'". Error:'. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query "'.$query.'". Error:'. mysql_error());
 	log_debug("selectGift: friendid:".$friendid.", giftid:".$giftid);
 }
 
 function unselectGift($giftid)
 {
-	connect();
+	$conn = connect();
 
 	$query = "update USER_GIFT set friendID = NULL where giftID = ".$giftid;
-	$result = mysql_query($query) or log_fail('Cannot execute query "'.$query.'". Error:'. mysql_error());
+	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query "'.$query.'". Error:'. mysql_error());
 	log_debug("unselectGift: giftid:".$giftid);
 }
 
