@@ -89,7 +89,10 @@ if (isset($_GET['fid'])) {
 if ($friendid > 0)
 {
     log_info('userid:'.$friendid);
-    $viewerid = $_COOKIE["vid"];
+    $viewerid = '';
+    if (isset($_COOKIE["vid"])) {
+    	$viewerid = $_COOKIE["vid"];
+    }
     if ($viewerid == '')
     {
         $viewerid = createFriend($friendid);

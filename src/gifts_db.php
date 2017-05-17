@@ -322,7 +322,7 @@ function getNearestNotifications($userid)
 	$result = getUpcomingHolidaysList($userid);
 
 	$content = "";
-	while ($row = mysql_fetch_array($result, MYSQLI_ASSOC))
+	while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
 	{
 		$d = date_parse($row['holidayDate']);
 		$sent = '';
@@ -422,7 +422,7 @@ function createFriend($userid)
 {
 	$conn = connect();
 
-	$query = "insert into FRIEND(email) values ('".$line."')";
+	$query = "insert into FRIEND(email) values ('viewer')";
 	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysqli_error($conn));
 	$query = 'SELECT LAST_INSERT_ID() FROM FRIEND';
 	$result = mysqli_query($conn, $query) or log_fail('Cannot execute query '. mysqli_error($conn));
