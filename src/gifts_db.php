@@ -227,6 +227,7 @@ function getGifts($userid)
 	$result = mysqli_query($conn, $query) or
 	          log_fail('Cannot execute query: '.$query.' Error: '. mysqli_error($conn).'\n');
 
+	$rows = null;
 	while ($row = @mysqli_fetch_array($result, MYSQLI_ASSOC))
 	{
 		$rows[] = $row;
